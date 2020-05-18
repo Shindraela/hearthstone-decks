@@ -10,6 +10,7 @@ import shaman from '../assets/shaman.jpg';
 import mage from '../assets/mage.jpg';
 import warlock from '../assets/warlock.jpg';
 import druid from '../assets/druid.jpg';
+import hearthstone from '../assets/hearthstone_logo.png';
 
 export class Home extends React.Component {
   constructor() {
@@ -19,39 +20,39 @@ export class Home extends React.Component {
       username: localStorage.getItem('myValueInLocalStorage') || "",
       playableClasses: [
         {
-          'class': 'Warrior',
+          'class': 'warrior',
           'picture': warrior
         },
         {
-          'class': 'Paladin',
+          'class': 'paladin',
           'picture': paladin
         },
         {
-          'class': 'Hunter',
+          'class': 'hunter',
           'picture': hunter
         },
         {
-          'class': 'Rogue',
+          'class': 'rogue',
           'picture': rogue
         },
         {
-          'class': 'Priest',
+          'class': 'priest',
           'picture': priest
         },
         {
-          'class': 'Shaman',
+          'class': 'shaman',
           'picture': shaman
         },
         {
-          'class': 'Mage',
+          'class': 'mage',
           'picture': mage
         },
         {
-          'class': 'Warlock',
+          'class': 'warlock',
           'picture': warlock
         },
         {
-          'class': 'Druid',
+          'class': 'druid',
           'picture': druid
         }
       ],
@@ -74,7 +75,7 @@ export class Home extends React.Component {
     const { playableClasses } = this.state;
 
     return playableClasses.map((playableClass, index) => (
-      <div className="image-container" key={index}>
+      <div className="image-container class-container" key={index}>
         <img src={playableClass.picture} className="responsive" alt="img" />
         <div className="hover-text">
           <button type="button" className="btn" onClick={() => this.chooseClass(playableClass.class)}>
@@ -87,7 +88,7 @@ export class Home extends React.Component {
 
   chooseClass(chosenClass) {
     const { fetchAllCards } = this.props;
-    const chosenClassUrl = `https://omgvamp-hearthstone-v1.p.rapidapi.com/cards/classes/${chosenClass}?locale=frFR`;
+    const chosenClassUrl = `https://us.api.blizzard.com/hearthstone/cards?locale=fr_FR&class=${chosenClass}`;
     localStorage.setItem('selectedClass', chosenClass);
 
     this.setState({
@@ -101,14 +102,16 @@ export class Home extends React.Component {
     const { username } = this.state;
 
     return (
-      <section className="gallery-container">
+      <section className="home-container">
+        <img src={hearthstone} alt="hearthstone logo" className="hearthstone-logo" />
+
         <div className="form-group">
-          <h2 className="pseudo-style">Choose your username</h2>
+          <h3 className="username-title">Choose your username</h3>
           <input name="username" type="text" className="form-control search-input" value={username} onChange={this.getValue} />
         </div>
 
-        <div>
-          <h2 className="class-style">Choose your class</h2>
+        <div className="classes-container">
+          <h3 className="class-title">Choose your class</h3>
           <div className="all-images">
             {this.renderPlayableClasses()}
           </div>

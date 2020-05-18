@@ -1,9 +1,11 @@
 /* ------------------------------------------------------------------------- */
 /* LAYOUT                                                                    */
 /* ------------------------------------------------------------------------- */
-html, body {
+html, body, .wrapper {
   padding: 0;
   margin: 0;
+  height: 100%;
+  width: 100%;
 }
 
 body {
@@ -15,13 +17,24 @@ body {
 /* ------------------------------------------------------------------------- */
 /* CARDS                                                                     */
 /* ------------------------------------------------------------------------- */
-.gallery-container {
+.home-container {
   margin: 0 auto;
   max-width: 1200px;
   padding: 0 15px;
 }
 
-.pseudo-style, .class-style {
+.cards-container {
+  background-color: white;
+  margin: 2rem;
+  height: 35rem;
+  overflow: auto;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.username-title, .class-title {
   font-weight: 800;
   text-align: center;
   text-transform: uppercase;
@@ -37,12 +50,19 @@ body {
 
 img {
   display: block;
-  border: 1px solid black;
 }
 
 .image-container {
-  margin: 15px;
+  /* margin: 15px; */
   position: relative;
+}
+
+.classes-container {
+  padding: 1rem;
+}
+
+.class-container {
+  margin: 1rem;
 }
 
 .hover-text {

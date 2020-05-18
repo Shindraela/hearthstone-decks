@@ -1,21 +1,20 @@
 import React from 'react';
 import Home from './Home';
 import CardsList from './CardsList';
+import LoadingRing from './LoadingRing';
 
 export class ContentContainer extends React.Component {
   render() {
     const { cards } = this.props;
-    console.log("cards :", cards);
     const username = localStorage.getItem('username');
     const selectedClass = localStorage.getItem('selectedClass');
+    const loader = <LoadingRing color="#2c82c9" />;
 
-    return (
-      <div>
-        {
-          username && selectedClass ? <CardsList cards={cards} /> : <Home />
-        }
-      </div>
-    )
+    return !username && !selectedClass ? <Home /> :
+    username && selectedClass && cards && cards.length === 0 ? <Home /> :
+    cards && cards.length > 0 ? <CardsList cards={cards} /> : loader;
+
+    // return !username && !selectedClass ? <Home /> : cards && cards.length > 0 ? <CardsList cards={cards} /> : loader;
   }
 }
 
