@@ -2,27 +2,27 @@ import React from 'react';
 import Card from './Card';
 import LoadingRing from './LoadingRing';
 import uniqBy from 'lodash/uniqBy';
+import { connect } from 'react-redux';
+import { fetchAllCards } from '../actions/index';
 
 export class CardsList extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      items: 20,
       loading: false,
-      currentCards: props.cards.slice(0, 20),
-      currentId: 20
+      currentCards: [...props.cards],
+      nextPage: 2
     }
 
     this.loadMore = this.loadMore.bind(this);
   }
 
-  static componentWillReceiveProps(nextProps) {
-    // Any time props.cards changes, update state.
-    if (nextProps.cards !== this.props.cards) {
-      this.setState({
-        currentCards: nextProps.currentCards
-      });
+  componentDidUpdate(prevProps) {
+    const { cards } = this.props;
+
+    if (cards !== prevProps.cards) {
+      this.setNewCurrentCards(cards);
     }
   }
 
@@ -30,14 +30,21 @@ export class CardsList extends React.Component {
     const myScroll = this.refs.myscroll;
 
     myScroll.addEventListener("scroll", () => {
-      
       if ((myScroll.scrollTop + myScroll.clientHeight) >= myScroll.scrollHeight) {
         this.loadMore();
       }
     });
   }
 
-  showItems() {
+  setNewCurrentCards(newCards) {
+    const { currentCards } = this.state;
+
+    this.setState({
+      currentCards: [...currentCards, ...newCards]
+    });
+  }
+
+  renderCards() {
     const { currentCards } = this.state;
     let items = [];
     
@@ -51,52 +58,39 @@ export class CardsList extends React.Component {
   }
 
   filtered(arrayToFilter) {
-    const { currentId } = this.state;
-    let id = currentId;
-    let results = null;
-    id = id + 20;
-
-    this.setState({
-      currentId: id
-    });
-
     arrayToFilter = uniqBy(arrayToFilter, 'name');
-    results = arrayToFilter.slice(currentId, id);
-
-    return results;
+    return arrayToFilter;
   }
 
   loadMore() {
-    const { cards } = this.props;
-    const { currentCards, currentId } = this.state;
-    const totalOfCurrentCards = currentCards.length;
-    const totalOfCards = uniqBy(cards, 'name').length;
+    const { pageCount } = this.props;
+    const { nextPage } = this.state;
+    const selectedClass = localStorage.getItem('selectedClass');
 
-    if(totalOfCurrentCards === totalOfCards) {
+    if(nextPage <= pageCount) {
+      const { fetchAllCards } = this.props;
+      const chosenClassUrl = `https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&page=${nextPage}&pageSize=40&set=standard&sort=manaCost&locale=fr_FR`;
+
       this.setState({
-        loading: false
-      }); 
-    } else {
-      this.setState({
-        loading: true
+        loading: true,
+        nextPage: (nextPage + 1)
       });
-  
+
+      fetchAllCards(chosenClassUrl);
+
       setTimeout(() => {
         this.setState({
-          currentCards: [...currentCards, ...this.filtered(cards)],
           loading: false
         });
       }, 2000);
     }
-  }
+    else {
+      this.setState({
+        loading: false
+      });
 
-  renderCards() {
-    const { cards } = this.props;
-
-    return cards && cards.length > 0 ?
-      <div className="all-images">
-        <Card cards={cards} />
-      </div> : <div>Pas de cartes trouvées.</div>
+      return;
+    }
   }
 
   render() {
@@ -106,11 +100,19 @@ export class CardsList extends React.Component {
 
     return (
       <div className="container cards-container" ref="myscroll">
-        { cards && cards.length === 0 ? loader : <div className="row gallery-container">{this.showItems()}</div> }
+        { cards && cards.length === 0 ? loader : <div className="row gallery-container">{this.renderCards()}</div> }
         { loading ? loader : "" }
       </div>
     )
   }
 }
 
-export default CardsList;
+const mapStateToProps = (state) => ({
+  cards: state.cards.items,
+});
+
+const dispatchMapToProps = (dispatch) => ({
+  fetchAllCards: (customUrl) => dispatch(fetchAllCards(customUrl)),
+});
+
+export default connect(mapStateToProps, dispatchMapToProps)(CardsList);

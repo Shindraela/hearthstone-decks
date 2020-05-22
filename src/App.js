@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchAllCards } from './actions/index';
+import { getNewAccessToken, fetchAllCards } from './actions/index';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import ContentContainer from './components/ContentContainer';
 import LoadingRing from './components/LoadingRing';
@@ -24,10 +24,15 @@ class App extends React.Component {
     }
   }
 
+  componentDidMount() {
+    const { getNewAccessToken } = this.props;
+    return getNewAccessToken();
+  }
+
   checkConnectedAlready() {
     const { fetchAllCards } = this.props;
     const { username, selectedClass } = this.state;
-    const chosenClassUrl = `https://us.api.blizzard.com/hearthstone/cards?locale=fr_FR&class=${selectedClass}`;
+    const chosenClassUrl = `https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&set=standard&sort=manaCost&locale=fr_FR`;
 
     if(username && selectedClass) {
       return fetchAllCards(chosenClassUrl);
@@ -35,7 +40,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { cards } = this.props;
+    const { cards, pageCount } = this.props;
     const loader = <LoadingRing color="#2c82c9" />;
 
     if(cards.error) return <div>Error</div>;
@@ -45,7 +50,7 @@ class App extends React.Component {
     return (
       <section className="wrapper">
         <Router basename="">
-          <Route exact path="/"><ContentContainer cards={cards} /></Route>
+          <Route exact path="/"><ContentContainer cards={cards} pageCount={pageCount} /></Route>
         </Router>
       </section>
     );
@@ -54,9 +59,11 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => ({
   cards: state.cards.items,
+  pageCount: state.cards.pageCount
 });
 
 const dispatchMapToProps = (dispatch) => ({
+  getNewAccessToken: () => dispatch(getNewAccessToken()),
   fetchAllCards: (url) => dispatch(fetchAllCards(url)),
 });
 

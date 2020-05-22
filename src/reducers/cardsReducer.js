@@ -7,7 +7,8 @@ import {
 const initialState = {
   pending: false,
   error: null,
-  items: []
+  pageCount: null,
+  items: [],
 };
 
 export default function cardsReducer(state = initialState, action) {
@@ -15,7 +16,7 @@ export default function cardsReducer(state = initialState, action) {
     case FETCH_CARDS_PENDING:
       return { ...state, pending: true };
     case FETCH_CARDS_SUCCESS:
-      return {...state, pending: false, items: action.payload.cards };
+      return {...state, pending: false, items: action.payload.cards, pageCount: action.payload.pageCount };
     case FETCH_CARDS_FAILURE:
       return { ...state, pending: false, error: action.payload.error };
     default:
