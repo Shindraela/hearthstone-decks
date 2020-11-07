@@ -2,32 +2,36 @@ import axios from 'axios';
 import { FETCH_CARDS_SUCCESS, FETCH_CARDS_PENDING, FETCH_ACCESS_TOKEN_SUCCESS, FETCH_ACCESS_TOKEN_PENDING } from './types';
 
 export const fetchAllCards = (url) => (dispatch) => {
-  if(url) {
-    const access_token = localStorage.getItem('accessToken');
-    const request = axios({
-      method: 'GET',
-      url: url,
-      headers: {
-        'Authorization': 'bearer ' + access_token,
-        'Content-Type': 'application/json'
-      }
-    });
-  
-    dispatch({ type: FETCH_CARDS_PENDING, payload: { pending: true }});
-  
-    request.then((res) => {
-      let classCards = [];
-      let pageCount = null;
+  console.log('url :', url)
+  const selectedClass = localStorage && localStorage.length > 0 ? localStorage.getItem('selectedClass') : null;
+  const requestUrl = url || `https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&set=standard&sort=manaCost&locale=fr_FR`;
+  const access_token = localStorage.getItem('accessToken');
+  const request = axios({
+    method: 'GET',
+    url: requestUrl,
+    headers: {
+      'Authorization': 'bearer ' + access_token,
+      'Content-Type': 'application/json'
+    }
+  });
 
-      if(res && res.data && res.data.cards.length > 0) {
-        classCards = res.data.cards;
-        pageCount = res.data.pageCount ? res.data.pageCount : null;
-      }
-  
-      dispatch({ type: FETCH_CARDS_SUCCESS, payload: { cards: classCards, pageCount }});
-      }
-    )
-  }
+  dispatch({ type: FETCH_CARDS_PENDING, payload: { pending: true }});
+
+  request.then((res) => {
+    let classCards = [];
+    let pageCount = null;
+    let page = null;
+
+    if(res && res.data && res.data.cards.length > 0) {
+      console.log("res.data :", res.data);
+      classCards = res.data.cards;
+      pageCount = res.data.pageCount ? res.data.pageCount : null;
+      page = res.data.page ? res.data.page : null;
+    }
+
+    dispatch({ type: FETCH_CARDS_SUCCESS, payload: { cards: classCards, pageCount, page }});
+    }
+  )
 }
 
 export const getNewAccessToken = () => (dispatch) => {

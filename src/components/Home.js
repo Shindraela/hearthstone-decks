@@ -88,14 +88,13 @@ export class Home extends React.Component {
 
   chooseClass(chosenClass) {
     const { fetchAllCards } = this.props;
-    const chosenClassUrl = `https://api.blizzard.com/hearthstone/cards?class=${chosenClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${chosenClass}&order=asc&pageSize=40&set=standard&sort=manaCost&locale=fr_FR`
     localStorage.setItem('selectedClass', chosenClass);
 
     this.setState({
       selectedClass: chosenClass
     });
 
-    return fetchAllCards(chosenClassUrl);
+    return fetchAllCards();
   }
 
   render() {

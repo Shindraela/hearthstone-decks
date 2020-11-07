@@ -32,15 +32,14 @@ class App extends React.Component {
   checkConnectedAlready() {
     const { fetchAllCards } = this.props;
     const { username, selectedClass } = this.state;
-    const chosenClassUrl = `https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&set=standard&sort=manaCost&locale=fr_FR`;
 
     if(username && selectedClass) {
-      return fetchAllCards(chosenClassUrl);
+      return fetchAllCards();
     }
   }
 
   render() {
-    const { cards, pageCount } = this.props;
+    const { cards, page, pageCount } = this.props;
     const loader = <LoadingRing color="#2c82c9" />;
 
     if(cards.error) return <div>Error</div>;
@@ -50,7 +49,7 @@ class App extends React.Component {
     return (
       <section className="wrapper">
         <Router basename="">
-          <Route exact path="/"><ContentContainer cards={cards} pageCount={pageCount} /></Route>
+          <Route exact path="/"><ContentContainer cards={cards} page={page} pageCount={pageCount} /></Route>
         </Router>
       </section>
     );
@@ -59,12 +58,13 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => ({
   cards: state.cards.items,
+  page: state.cards.page,
   pageCount: state.cards.pageCount
 });
 
 const dispatchMapToProps = (dispatch) => ({
   getNewAccessToken: () => dispatch(getNewAccessToken()),
-  fetchAllCards: (url) => dispatch(fetchAllCards(url)),
+  fetchAllCards: () => dispatch(fetchAllCards()),
 });
 
 export default connect(mapStateToProps, dispatchMapToProps)(App);
