@@ -15,7 +15,8 @@ export class ContentContainer extends React.Component {
       selectedClass: localStorage && localStorage.length > 0 ? localStorage.getItem('selectedClass') : null,
       term : null,
       type: null,
-      value: null
+      value: null,
+      filters: []
     }
 
     this.handleOnChange = this.handleOnChange.bind(this);
@@ -23,52 +24,58 @@ export class ContentContainer extends React.Component {
 
   handleMultiOptions = async (type, value) => {
     const { fetchAllCards } = this.props;
-    const { selectedClass } = this.state;
-    let url = null;
+    const { selectedClass, filters } = this.state;
+    let url = `https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&set=standard&sort=manaCost&locale=fr_FR`;
     let currentType = null;
+    let newOptions = null;
 
-    // FIX : need to add not only one, but multiple options on URL
-    if(type === "cardSetOptions") {
-      currentType = value ? "set" : "";
-      url = (`https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&${currentType}=${value}&sort=manaCost&locale=fr_FR`);
+    if(filters.length === 0) {
+      filters.push({type, value});
+    } else {
+
+      filters.forEach((filter, index) => {
+        if (filter.type === type) {
+          filters.splice(index, 1);
+        }
+        newOptions = {type, value};
+      });
+
+      filters.push(newOptions);
     }
-    
-    if(type === "manaOptions") {
-      currentType = value ? "manaCost" : "";
-      url = (`https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&${currentType}=${value}&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&sort=manaCost&locale=fr_FR`);
-    }
-    
-    if(type === "healthOptions") {
-      currentType = value ? "health" : "";
-      url = (`https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&sort=manaCost&${currentType}=${value}&locale=fr_FR`);
-    }
-    
-    if(type === "typeOptions") {
-      currentType = value ? "type" : "";
-      url = (`https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&sort=manaCost&${currentType}=${value}&locale=fr_FR`);
-    }
-    
-    if(type === "rarityOptions") {
-      currentType = value ? "rarity" : "";
-      url = (`https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&sort=manaCost&${currentType}=${value}&locale=fr_FR`);
-    }
-    
-    if(type === "minionOptions") {
-      currentType = value ? "minionType" : "";
-      url = (`https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&sort=manaCost&${currentType}=${value}&locale=fr_FR`);
-    }
-    
-    if(type === "keywordsOptions") {
-      currentType = value ? "keyword" : "";
-      url = (`https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&sort=manaCost&${currentType}=${value}&locale=fr_FR`);
-    }
+
+    filters.forEach((filter) => {
+      switch(filter.type) {
+        case "cardSetOptions":
+          currentType = value ? "set" : "";
+          break;
+        case "manaOptions":
+          currentType = value ? "manaCost" : "";
+          break;
+        case "healthOptions":
+          currentType = value ? "health" : "";
+          break;
+        case "typeOptions":
+          currentType = value ? "type" : "";
+          break;
+        case "rarityOptions":
+          currentType = value ? "rarity" : "";
+          break;
+        case "minionOptions":
+          currentType = value ? "minionType" : "";
+          break;
+        case "keywordsOptions":
+          currentType = value ? "keyword" : "";
+          break;
+      }
+
+      url = `${url}&${currentType}=${filter.value}`;
+    });
 
     this.setState({
       type: currentType,
       value: value
     });
 
-    console.log("url :", url);
     return fetchAllCards(url);
   }
 
