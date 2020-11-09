@@ -25,14 +25,13 @@ export class ContentContainer extends React.Component {
   handleMultiOptions = async (type, value) => {
     const { fetchAllCards } = this.props;
     const { selectedClass, filters } = this.state;
-    let url = `https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&set=standard&sort=manaCost&locale=fr_FR`;
+    let url = `https://api.blizzard.com/hearthstone/cards?class=${selectedClass}%2Cneutral&collectible=1&deckFormat=standard&multiClass=${selectedClass}&order=asc&pageSize=40&page=1&sort=manaCost&locale=fr_FR`;
     let currentType = null;
     let newOptions = null;
 
     if(filters.length === 0) {
       filters.push({type, value});
     } else {
-
       filters.forEach((filter, index) => {
         if (filter.type === type) {
           filters.splice(index, 1);
@@ -99,7 +98,9 @@ export class ContentContainer extends React.Component {
       {value: 'saviors-of-uldum', label: 'Saviors of Uldum'},
       {value: 'rise-of-shadows', label: 'Rise of Shadows'},
       {value: 'classic', label: 'Classic'},
-      {value: 'basic', label: 'Basic'}
+      {value: 'basic', label: 'Basic'},
+      {value: 'scholomance-academy', label: 'Scholomance Academy'},
+      {value: 'madness-at-the-darkmoon-faire', label: 'Madness at the Darkmoon Faire'}
     ];
     const manaOptions = [
       {value: '', label: 'Any Cost'},
